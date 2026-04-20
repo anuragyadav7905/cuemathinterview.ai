@@ -1,25 +1,33 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useInterview } from '../context/InterviewContext'
-import { CheckCircle, ExternalLink, Clock, MessageSquare, Award, LayoutDashboard, Loader2 } from 'lucide-react'
+import { CheckCircle, ExternalLink, Clock, MessageSquare, Award, LayoutDashboard, Loader2, AlertTriangle } from 'lucide-react'
 
 export default function InterviewComplete() {
-  const { candidate, duration, questionsAnswered, transcript, teachingConvo, evaluation, setEvaluation } = useInterview()
+  const { candidate, duration, questionsAnswered, transcript, teachingConvo, interviewId, evaluation, setEvaluation } = useInterview()
   const [evalStatus, setEvalStatus] = useState('loading') // loading | done | error
-  const totalMin = Math.floor((duration || 600) / 60)
-  const totalSec = (duration || 600) % 60
+  const totalMin = Math.floor((duration || 0) / 60)
+  const totalSec = (duration || 0) % 60
 
   useEffect(() => {
     async function runEval() {
       try {
+        // 1. Persist transcripts and mark interview complete in MongoDB
+        if (interviewId && !String(interviewId).startsWith('local_')) {
+          await axios.post(`/api/interviews/${interviewId}/complete`, { duration }).catch(() => {})
+        }
+
+        // 2. Run Gemini evaluation (server saves Assessment to MongoDB automatically)
         const { data } = await axios.post('/api/evaluate', {
           candidate,
           qaTranscript: transcript,
           teachingConvo,
+          interviewId,
+          candidateId: candidate?._id,
         })
         setEvaluation(data)
 
-        // Persist to localStorage so AdminDashboard can read it
+        // 3. Also persist to localStorage as a fallback for admin dashboard
         const stored = JSON.parse(localStorage.getItem('cuemath_evaluations') || '[]')
         const entry = {
           id: Date.now().toString(),
@@ -41,6 +49,8 @@ export default function InterviewComplete() {
     runEval()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const scoreColor = s => s >= 4 ? 'text-green-600' : s >= 3 ? 'text-yellow-600' : 'text-red-500'
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Nav */}
@@ -49,7 +59,7 @@ export default function InterviewComplete() {
         <div className="items-center gap-2 hidden"><div className="w-7 h-7 bg-[#FFD000] rounded-sm flex items-center justify-center"><span className="text-[#1A1A1A] font-black text-xs">C</span></div><span className="text-[#1A1A1A] font-black text-lg tracking-tight">CUEMATH</span></div>
       </nav>
 
-      <div className="flex-1 flex items-center justify-center py-20">
+      <div className="flex-1 flex items-center justify-center py-16">
         <div className="max-w-lg w-full text-center px-8">
           {/* Success icon */}
           <div className="w-24 h-24 bg-[#FFD000] rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-[#FFD000]/30">
@@ -62,8 +72,8 @@ export default function InterviewComplete() {
             interview and reach out within <strong>48 hours</strong>.
           </p>
 
-          {/* Summary card */}
-          <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-6 mb-8 text-left">
+          {/* Session summary */}
+          <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-6 mb-6 text-left">
             <h3 className="font-bold text-sm text-gray-400 uppercase tracking-wide mb-4">Session Summary</h3>
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
@@ -94,19 +104,89 @@ export default function InterviewComplete() {
                 )}
                 {evalStatus === 'done' && (
                   <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                    Complete
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full" /> Complete
                   </span>
                 )}
                 {evalStatus === 'error' && (
                   <span className="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded-full">
-                    <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full" />
-                    Under Review
+                    <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full" /> Under Review
                   </span>
                 )}
               </div>
             </div>
           </div>
+
+          {/* Loading state */}
+          {evalStatus === 'loading' && (
+            <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-8 mb-6 flex flex-col items-center gap-4">
+              <Loader2 size={36} className="animate-spin text-[#FFD000]" />
+              <div>
+                <p className="font-bold text-[#1A1A1A]">Generating your evaluation…</p>
+                <p className="text-sm text-gray-400 mt-1">Gemini AI is analyzing your responses</p>
+              </div>
+            </div>
+          )}
+
+          {/* Error state */}
+          {evalStatus === 'error' && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5 mb-6 flex items-start gap-3 text-left">
+              <AlertTriangle size={18} className="text-yellow-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-yellow-800">Evaluation will be processed manually</p>
+                <p className="text-xs text-yellow-600 mt-1">Our team will review your interview within 48 hours.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Evaluation results */}
+          {evalStatus === 'done' && evaluation && (
+            <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-6 mb-6 text-left">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide font-bold mb-1">Overall Score</p>
+                  <p className={`text-5xl font-black ${scoreColor(evaluation.overall)}`}>
+                    {evaluation.overall?.toFixed(1)}
+                    <span className="text-lg text-gray-400 font-normal">/5</span>
+                  </p>
+                </div>
+                <span className={`text-sm font-bold px-5 py-2 rounded-full ${
+                  evaluation.recommendation === 'Advance' ? 'bg-green-100 text-green-700' :
+                  evaluation.recommendation === 'Reject'  ? 'bg-red-100 text-red-600' :
+                  'bg-yellow-100 text-yellow-700'
+                }`}>{evaluation.recommendation}</span>
+              </div>
+
+              {/* Dimension bars */}
+              {evaluation.dimensions?.length > 0 && (
+                <div className="flex flex-col gap-2.5 mb-5">
+                  {evaluation.dimensions.map((d, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <span className="text-xs text-gray-600 w-32 shrink-0">{d.name}</span>
+                      <div className="flex-1 bg-gray-200 rounded-full h-1.5">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: `${(d.score / 5) * 100}%`,
+                            backgroundColor: d.score >= 4 ? '#22C55E' : d.score >= 3 ? '#FFD000' : '#EF4444'
+                          }}
+                        />
+                      </div>
+                      <span className={`text-xs font-bold w-6 text-right ${scoreColor(d.score)}`}>{d.score?.toFixed(1)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {evaluation.strengths?.length > 0 && (
+                <div className="bg-green-50 border border-green-100 rounded-xl p-4">
+                  <p className="text-xs font-bold text-green-700 mb-2">Key Strengths</p>
+                  {evaluation.strengths.map((s, i) => (
+                    <p key={i} className="text-xs text-gray-700 mb-1">✓ {s}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* What happens next */}
           <div className="bg-[#1A1A1A] rounded-2xl p-6 mb-8 text-left">
@@ -125,46 +205,8 @@ export default function InterviewComplete() {
             ))}
           </div>
 
-          {/* Evaluation results */}
-          {evalStatus === 'done' && evaluation && (
-            <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-6 mb-8 text-left">
-              <h3 className="font-bold text-sm text-gray-400 uppercase tracking-wide mb-4">Your Evaluation</h3>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-4xl font-black text-[#1A1A1A]">{evaluation.overall?.toFixed(1) ?? '—'}<span className="text-lg text-gray-400 font-normal">/5</span></p>
-                  <p className="text-xs text-gray-500 mt-0.5">Overall Score</p>
-                </div>
-                <span className={`text-sm font-bold px-4 py-2 rounded-full ${
-                  evaluation.recommendation === 'Advance' ? 'bg-green-100 text-green-700' :
-                  evaluation.recommendation === 'Reject'  ? 'bg-red-100 text-red-600' :
-                  'bg-yellow-100 text-yellow-700'
-                }`}>{evaluation.recommendation}</span>
-              </div>
-              {evaluation.dimensions?.length > 0 && (
-                <div className="flex flex-col gap-2 mb-4">
-                  {evaluation.dimensions.map((d, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <span className="text-xs text-gray-600 w-32 shrink-0">{d.name}</span>
-                      <div className="flex-1 bg-gray-200 rounded-full h-1.5">
-                        <div className="h-full bg-[#FFD000] rounded-full" style={{ width: `${(d.score / 5) * 100}%` }} />
-                      </div>
-                      <span className="text-xs font-bold text-[#1A1A1A] w-6 text-right">{d.score?.toFixed(1)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {evaluation.strengths?.length > 0 && (
-                <div className="mt-3">
-                  <p className="text-xs font-bold text-green-700 mb-1.5">Strengths</p>
-                  {evaluation.strengths.map((s, i) => <p key={i} className="text-xs text-gray-600 mb-1">✓ {s}</p>)}
-                </div>
-              )}
-            </div>
-          )}
-
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              id="return-cuemath-btn"
               href="https://cuemath.com"
               target="_blank"
               rel="noreferrer"

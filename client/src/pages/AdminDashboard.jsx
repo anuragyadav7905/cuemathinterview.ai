@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import axios from 'axios'
 import {
   Search, Download, ChevronRight, Star, TrendingUp, MessageSquare,
   User, BadgeCheck, Users, BarChart2, ClipboardList, ArrowUpRight,
@@ -717,11 +718,33 @@ function AssessmentsTab({ candidates }) {
   )
 }
 
-function loadRealCandidates() {
+function mapInterviewToCandidate(iv) {
+  const c = iv.candidateId || {}
+  const a = iv.assessment
+  const durationSec = iv.duration || 0
+  return {
+    id: iv._id,
+    name: c.name || 'Unknown Candidate',
+    email: c.email || '',
+    phone: c.phone || '',
+    date: new Date(iv.startTime).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+    duration: durationSec ? `${Math.floor(durationSec / 60)}m ${durationSec % 60}s` : '—',
+    score: a?.overallScore ?? 0,
+    recommendation: a?.recommendation || 'Under Review',
+    dimensions: a?.dimensions || [],
+    strengths: a?.strengths || [],
+    improvements: a?.improvements || [],
+    transcript: (iv.transcript || []).map(t => ({ role: t.role === 'ai' ? 'AI' : 'Candidate', text: t.text })),
+    teachingTranscript: (iv.teachingTranscript || []).map(t => ({ role: t.role === 'teacher' ? 'Candidate' : 'Student', text: t.text })),
+    summary: a?.summary || '',
+  }
+}
+
+function loadFromLocalStorage() {
   try {
     const stored = JSON.parse(localStorage.getItem('cuemath_evaluations') || '[]')
     return stored.map((entry, i) => ({
-      id: `real-${entry.id || i}`,
+      id: `local-${entry.id || i}`,
       name: entry.candidate?.name || 'Unknown Candidate',
       email: entry.candidate?.email || '',
       phone: entry.candidate?.phone || '',
@@ -733,7 +756,7 @@ function loadRealCandidates() {
       strengths: entry.evaluation?.strengths || [],
       improvements: entry.evaluation?.improvements || [],
       transcript: entry.transcript || [],
-      teachingTranscript: (entry.teachingConvo || []).map(t => ({ role: t.role === 'ai' ? 'AI' : 'Candidate', text: t.text })),
+      teachingTranscript: (entry.teachingConvo || []).map(t => ({ role: t.role === 'teacher' ? 'Candidate' : 'Student', text: t.text })),
       summary: entry.evaluation?.summary || '',
     }))
   } catch {
@@ -743,9 +766,20 @@ function loadRealCandidates() {
 
 // ── Main component ───────────────────────────────────────────────────────────
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab]       = useState('Dashboard')
+  const [activeTab, setActiveTab]         = useState('Dashboard')
   const [jumpCandidate, setJumpCandidate] = useState(null)
-  const [realCandidates] = useState(loadRealCandidates)
+  const [realCandidates, setRealCandidates] = useState([])
+
+  useEffect(() => {
+    axios.get('/api/interviews')
+      .then(({ data }) => {
+        const mapped = data
+          .filter(iv => iv.candidateId && iv.assessment)
+          .map(mapInterviewToCandidate)
+        setRealCandidates(mapped.length > 0 ? mapped : loadFromLocalStorage())
+      })
+      .catch(() => setRealCandidates(loadFromLocalStorage()))
+  }, [])
 
   const TABS = [
     { id: 'Dashboard',   icon: <BarChart2 size={15} /> },

@@ -1,5 +1,9 @@
 const express = require('express')
 const router = express.Router()
+const mongoose = require('mongoose')
+const Assessment = require('../models/Assessment')
+const Interview = require('../models/Interview')
+const Candidate = require('../models/Candidate')
 
 const STRENGTHS_POOL = [
   'Articulates concepts clearly and confidently',
@@ -27,52 +31,9 @@ const IMPROVEMENTS_POOL = [
   'Use more varied teaching techniques for different learner types',
 ]
 
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5)
-}
-
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5) }
 function clamp(val, min = 1.0, max = 5.0) {
   return Math.round(Math.max(min, Math.min(max, val)) * 10) / 10
-}
-
-function generateFallbackEval(candidate, qaTranscript, teachingConvo) {
-  const candidateAnswers = qaTranscript.filter(t => t.role === 'candidate')
-  const totalChars = candidateAnswers.reduce((s, t) => s + (t.text || '').length, 0)
-  const avgLen = totalChars / Math.max(1, candidateAnswers.length)
-
-  // Base score derived from answer richness (200–600 chars → 2.5–4.5)
-  const base = clamp(2.5 + (avgLen / 500) * 2.0)
-  const noise = () => (Math.random() - 0.5) * 0.8
-
-  const teaching     = clamp(base + noise())
-  const communication = clamp(base + noise() + 0.1)
-  const temperament  = clamp(base + noise())
-  const confidence   = clamp(base + noise() - 0.1)
-  const environment  = clamp(base + noise() - 0.2)
-  const overall      = clamp((teaching + communication + temperament + confidence + environment) / 5)
-
-  const recommendation = overall >= 4.0 ? 'Advance' : overall >= 3.0 ? 'Maybe' : 'Reject'
-
-  const SUMMARY_BY_REC = {
-    Advance: `${candidate?.name || 'The candidate'} demonstrated strong teaching capabilities and clear subject mastery throughout the assessment. Their communication style and student engagement approach are well-suited for Cuemath's standards.`,
-    Maybe:   `${candidate?.name || 'The candidate'} showed reasonable teaching potential with some areas requiring further development. With targeted coaching, they could meet Cuemath's quality bar.`,
-    Reject:  `${candidate?.name || 'The candidate'} struggled to demonstrate the teaching clarity and student engagement expected at this level. Significant improvement in pedagogy and communication is recommended before re-applying.`,
-  }
-
-  return {
-    dimensions: [
-      { name: 'Teaching Ability', score: teaching,      evidence: generateEvidence('Teaching Ability', teaching) },
-      { name: 'Communication',    score: communication,  evidence: generateEvidence('Communication',    communication) },
-      { name: 'Temperament',      score: temperament,    evidence: generateEvidence('Temperament',      temperament) },
-      { name: 'Confidence',       score: confidence,     evidence: generateEvidence('Confidence',       confidence) },
-      { name: 'Environment',      score: environment,    evidence: generateEvidence('Environment',      environment) },
-    ],
-    overall,
-    recommendation,
-    strengths:    shuffle(STRENGTHS_POOL).slice(0, overall >= 4 ? 4 : 2),
-    improvements: shuffle(IMPROVEMENTS_POOL).slice(0, overall < 3 ? 5 : overall < 4 ? 3 : 2),
-    summary: SUMMARY_BY_REC[recommendation],
-  }
 }
 
 function generateEvidence(dimension, score) {
@@ -117,6 +78,44 @@ function generateEvidence(dimension, score) {
   return MAP[dimension]?.[level] || `"Score: ${score} — ${level} performance in this dimension."`
 }
 
+function generateFallbackEval(candidate, qaTranscript, teachingConvo) {
+  const candidateAnswers = qaTranscript.filter(t => t.role === 'candidate')
+  const totalChars = candidateAnswers.reduce((s, t) => s + (t.text || '').length, 0)
+  const avgLen = totalChars / Math.max(1, candidateAnswers.length)
+
+  const base = clamp(2.5 + (avgLen / 500) * 2.0)
+  const noise = () => (Math.random() - 0.5) * 0.8
+
+  const teaching      = clamp(base + noise())
+  const communication = clamp(base + noise() + 0.1)
+  const temperament   = clamp(base + noise())
+  const confidence    = clamp(base + noise() - 0.1)
+  const environment   = clamp(base + noise() - 0.2)
+  const overall       = clamp((teaching + communication + temperament + confidence + environment) / 5)
+  const recommendation = overall >= 4.0 ? 'Advance' : overall >= 3.0 ? 'Maybe' : 'Reject'
+
+  const SUMMARY_BY_REC = {
+    Advance: `${candidate?.name || 'The candidate'} demonstrated strong teaching capabilities and clear subject mastery throughout the assessment. Their communication style and student engagement approach are well-suited for Cuemath's standards.`,
+    Maybe:   `${candidate?.name || 'The candidate'} showed reasonable teaching potential with some areas requiring further development. With targeted coaching, they could meet Cuemath's quality bar.`,
+    Reject:  `${candidate?.name || 'The candidate'} struggled to demonstrate the teaching clarity and student engagement expected at this level. Significant improvement in pedagogy and communication is recommended before re-applying.`,
+  }
+
+  return {
+    dimensions: [
+      { name: 'Teaching Ability', score: teaching,      evidence: generateEvidence('Teaching Ability', teaching) },
+      { name: 'Communication',    score: communication,  evidence: generateEvidence('Communication',    communication) },
+      { name: 'Temperament',      score: temperament,    evidence: generateEvidence('Temperament',      temperament) },
+      { name: 'Confidence',       score: confidence,     evidence: generateEvidence('Confidence',       confidence) },
+      { name: 'Environment',      score: environment,    evidence: generateEvidence('Environment',      environment) },
+    ],
+    overall,
+    recommendation,
+    strengths:    shuffle(STRENGTHS_POOL).slice(0, overall >= 4 ? 4 : 2),
+    improvements: shuffle(IMPROVEMENTS_POOL).slice(0, overall < 3 ? 5 : overall < 4 ? 3 : 2),
+    summary: SUMMARY_BY_REC[recommendation],
+  }
+}
+
 function buildGeminiPrompt(candidate, qaTranscript, teachingConvo) {
   const qaText = qaTranscript.map(t =>
     `${t.role === 'ai' ? 'Interviewer' : 'Candidate'}: ${t.text}`
@@ -136,45 +135,50 @@ ${qaText || '(No Q&A recorded)'}
 === TEACHING DEMO TRANSCRIPT ===
 ${teachText || '(No teaching demo recorded)'}
 
-Evaluate the candidate on these 5 dimensions (score 1.0 to 5.0, one decimal):
-1. Teaching Ability — clarity of concept delivery, use of examples, Grade-level appropriateness
+Evaluate on 5 dimensions (score 1.0–5.0):
+1. Teaching Ability — clarity, examples, Grade-level appropriateness
 2. Communication — language clarity, structure, absence of jargon
-3. Temperament — patience, composure, encouragement style
+3. Temperament — patience, composure, encouragement
 4. Confidence — camera presence, voice, directness
 5. Environment — lighting, background, noise, professionalism
 
-Also provide:
-- overall: average of the 5 scores (one decimal)
-- recommendation: exactly one of "Advance", "Maybe", or "Reject"
-  (Advance = overall ≥ 4.0, Maybe = 3.0–3.9, Reject = below 3.0)
-- strengths: 2–4 specific strengths observed (short bullet phrases)
-- improvements: 2–4 specific areas for improvement
-- summary: 2-sentence paragraph evaluating the candidate
-- For each dimension, an evidence quote: 1 sentence in double quotes describing what was observed
+Also provide: overall (avg of 5), recommendation ("Advance"≥4.0 / "Maybe"≥3.0 / "Reject"<3.0), strengths (2–4), improvements (2–4), summary (2 sentences), evidence per dimension.
 
-Return ONLY valid JSON (no markdown, no code fences):
-{
-  "dimensions": [
-    {"name": "Teaching Ability", "score": X.X, "evidence": "\"...\""},
-    {"name": "Communication",    "score": X.X, "evidence": "\"...\""},
-    {"name": "Temperament",      "score": X.X, "evidence": "\"...\""},
-    {"name": "Confidence",       "score": X.X, "evidence": "\"...\""},
-    {"name": "Environment",      "score": X.X, "evidence": "\"...\""}
-  ],
-  "overall": X.X,
-  "recommendation": "Advance|Maybe|Reject",
-  "strengths": ["...", "..."],
-  "improvements": ["...", "..."],
-  "summary": "..."
-}`
+Return ONLY valid JSON (no markdown):
+{"dimensions":[{"name":"Teaching Ability","score":X.X,"evidence":"\"...\""},{"name":"Communication","score":X.X,"evidence":"\"...\""},{"name":"Temperament","score":X.X,"evidence":"\"...\""},{"name":"Confidence","score":X.X,"evidence":"\"...\""},{"name":"Environment","score":X.X,"evidence":"\"...\""}],"overall":X.X,"recommendation":"Advance|Maybe|Reject","strengths":["..."],"improvements":["..."],"summary":"..."}`
+}
+
+async function saveToMongo(result, interviewId, candidateId) {
+  if (!interviewId || !candidateId || mongoose.connection.readyState !== 1) return
+  if (typeof interviewId === 'string' && interviewId.startsWith('local_')) return
+  try {
+    const assessment = new Assessment({
+      interviewId,
+      candidateId,
+      overallScore:   result.overall,
+      recommendation: result.recommendation,
+      dimensions:     result.dimensions,
+      strengths:      result.strengths,
+      improvements:   result.improvements,
+      summary:        result.summary,
+    })
+    await assessment.save()
+    await Interview.findByIdAndUpdate(interviewId, { status: 'assessed' })
+    await Candidate.findByIdAndUpdate(candidateId, { status: 'assessed' })
+    result.assessmentId = assessment._id.toString()
+  } catch (e) {
+    console.error('MongoDB assessment save failed:', e.message)
+  }
 }
 
 router.post('/', async (req, res) => {
-  const { candidate, qaTranscript = [], teachingConvo = [] } = req.body
+  const { candidate, qaTranscript = [], teachingConvo = [], interviewId, candidateId } = req.body
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    return res.json(generateFallbackEval(candidate, qaTranscript, teachingConvo))
+    const result = generateFallbackEval(candidate, qaTranscript, teachingConvo)
+    await saveToMongo(result, interviewId, candidateId)
+    return res.json(result)
   }
 
   try {
@@ -196,14 +200,15 @@ router.post('/', async (req, res) => {
 
     const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
     const parsed = JSON.parse(cleaned)
-
-    // Validate required fields exist
     if (!parsed.dimensions || !parsed.overall || !parsed.recommendation) throw new Error('Invalid shape')
 
+    await saveToMongo(parsed, interviewId, candidateId)
     res.json(parsed)
   } catch (err) {
     console.error('Gemini eval failed, using fallback:', err.message)
-    res.json(generateFallbackEval(candidate, qaTranscript, teachingConvo))
+    const result = generateFallbackEval(candidate, qaTranscript, teachingConvo)
+    await saveToMongo(result, interviewId, candidateId)
+    res.json(result)
   }
 })
 

@@ -20,7 +20,7 @@ const TOOLS = [
 
 export default function TeachingDemo() {
   const navigate = useNavigate()
-  const { addTeachingMessage, setDuration } = useInterview()
+  const { addTeachingMessage, setDuration, interviewId, teachingConvo } = useInterview()
 
   // Canvas refs
   const canvasRef     = useRef(null)
@@ -264,6 +264,11 @@ export default function TeachingDemo() {
 
   function endSession() {
     setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000))
+    if (interviewId && !String(interviewId).startsWith('local_')) {
+      axios.post(`/api/interviews/${interviewId}/teaching-transcript`, {
+        entries: teachingConvo.map(t => ({ role: t.role, text: t.text })),
+      }).catch(() => {})
+    }
     navigate('/complete')
   }
 

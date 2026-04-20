@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../context/InterviewContext'
 import { Mic, MicOff, ChevronRight } from 'lucide-react'
 import toast from 'react-hot-toast'
+import axios from 'axios'
 
 const QUESTIONS = [
   "Tell me about yourself and your teaching experience.",
@@ -15,11 +16,22 @@ const QUESTIONS = [
 
 export default function QARound() {
   const navigate = useNavigate()
-  const { candidate, addTranscript, setQuestionsAnswered, setDuration } = useInterview()
+  const { candidate, addTranscript, setQuestionsAnswered, setDuration, interviewId, setInterviewId } = useInterview()
+
+  // Start interview in MongoDB on mount
+  useEffect(() => {
+    if (candidate?._id && !interviewId) {
+      axios.post('/api/interviews/start', { candidateId: candidate._id })
+        .then(({ data }) => setInterviewId(data._id))
+        .catch(() => setInterviewId(`local_${Date.now()}`))
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const videoRef = useRef(null)
   const recognitionRef = useRef(null)
   const synthRef = useRef(window.speechSynthesis)
   const startTimeRef = useRef(Date.now())
+
+  const localTranscriptRef = useRef([]) // mirror for reliable MongoDB save
 
   const [qIndex, setQIndex] = useState(0)
   const [status, setStatus] = useState('speaking') // speaking | listening | processing
@@ -106,13 +118,15 @@ export default function QARound() {
     const answer = liveTranscript || '(No response recorded)'
     addTranscript('ai', QUESTIONS[qIndex])
     addTranscript('candidate', answer)
+    localTranscriptRef.current.push({ role: 'ai', text: QUESTIONS[qIndex] })
+    localTranscriptRef.current.push({ role: 'candidate', text: answer })
     setLiveTranscript('')
 
     setTimeout(() => {
       if (qIndex + 1 >= QUESTIONS.length) {
         setQuestionsAnswered(QUESTIONS.length)
         setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000))
-        navigate('/interview/teaching')
+        advanceToTeaching()
       } else {
         const next = qIndex + 1
         setQIndex(next)
@@ -120,6 +134,15 @@ export default function QARound() {
         setQuestionsAnswered(next + 1)
       }
     }, 800)
+  }
+
+  function advanceToTeaching() {
+    if (interviewId && !String(interviewId).startsWith('local_')) {
+      axios.post(`/api/interviews/${interviewId}/transcript`, {
+        entries: localTranscriptRef.current,
+      }).catch(() => {})
+    }
+    navigate('/interview/teaching')
   }
 
   function toggleMic() {
@@ -137,11 +160,13 @@ export default function QARound() {
     setLiveTranscript('')
     addTranscript('ai', QUESTIONS[qIndex])
     addTranscript('candidate', answer)
+    localTranscriptRef.current.push({ role: 'ai', text: QUESTIONS[qIndex] })
+    localTranscriptRef.current.push({ role: 'candidate', text: answer })
     setTimeout(() => {
       if (qIndex + 1 >= QUESTIONS.length) {
         setQuestionsAnswered(QUESTIONS.length)
         setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000))
-        navigate('/interview/teaching')
+        advanceToTeaching()
       } else {
         const next = qIndex + 1
         setQIndex(next)
