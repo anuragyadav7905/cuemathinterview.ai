@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-yellow: #FFD000;
+  --color-brand-black: #1A1A1A;
+  --color-brand-grey: #F9FAFB;
+  --color-brand-dark: #111111;
+  --color-brand-muted: #6B7280;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #FFFFFF;
+  color: #1A1A1A;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #FFD000; border-radius: 3px; }
+
+/* Pulse animation for recording dot */
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-wave-1 { animation: wave 1.2s ease-in-out infinite 0s; }
+.animate-wave-2 { animation: wave 1.2s ease-in-out infinite 0.15s; }
+.animate-wave-3 { animation: wave 1.2s ease-in-out infinite 0.3s; }
+.animate-wave-4 { animation: wave 1.2s ease-in-out infinite 0.45s; }
+.animate-wave-5 { animation: wave 1.2s ease-in-out infinite 0.6s; }
+.animate-wave-6 { animation: wave 1.2s ease-in-out infinite 0.75s; }
+.animate-wave-7 { animation: wave 1.2s ease-in-out infinite 0.9s; }
+
+.animate-fadeInUp { animation: fadeInUp 0.5s ease-out forwards; }
+.animate-pulse-red { animation: pulse-red 1s ease-in-out infinite; }
+
+/* Canvas cursor */
+canvas { cursor: crosshair; }
+canvas.select-mode { cursor: default; }
+canvas.text-mode { cursor: text; }
+canvas.eraser-mode { cursor: cell; }
