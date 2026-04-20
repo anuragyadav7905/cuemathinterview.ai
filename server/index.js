@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
+const path = require('path')
 
 const candidateRoutes = require('./routes/candidates')
 const interviewRoutes = require('./routes/interviews')
@@ -34,8 +35,12 @@ app.get('/api/health', (req, res) => {
   })
 })
 
-// 404
-app.use((req, res) => res.status(404).json({ message: 'Route not found' }))
+// Serve client build in production
+app.use(express.static(path.join(__dirname, '../client/dist')))
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) return res.status(404).json({ message: 'Route not found' })
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'))
+})
 
 // Error handler
 app.use((err, req, res, next) => {

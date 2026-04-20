@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Search, Download, ChevronRight, Star, TrendingUp, MessageSquare,
   User, BadgeCheck, Users, BarChart2, ClipboardList, ArrowUpRight,
@@ -380,9 +380,13 @@ function DashboardTab({ candidates, onViewCandidate }) {
 }
 
 // ── Candidates tab ───────────────────────────────────────────────────────────
-function CandidatesTab({ candidates }) {
-  const [selected, setSelected] = useState(candidates[0])
+function CandidatesTab({ candidates, initialSelected }) {
+  const [selected, setSelected] = useState(initialSelected || candidates[0])
   const [search, setSearch]     = useState('')
+
+  useEffect(() => {
+    if (initialSelected) setSelected(initialSelected)
+  }, [initialSelected])
 
   const filtered = candidates.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -729,6 +733,7 @@ function loadRealCandidates() {
       strengths: entry.evaluation?.strengths || [],
       improvements: entry.evaluation?.improvements || [],
       transcript: entry.transcript || [],
+      teachingTranscript: (entry.teachingConvo || []).map(t => ({ role: t.role === 'ai' ? 'AI' : 'Candidate', text: t.text })),
       summary: entry.evaluation?.summary || '',
     }))
   } catch {

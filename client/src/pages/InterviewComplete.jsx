@@ -4,7 +4,7 @@ import { useInterview } from '../context/InterviewContext'
 import { CheckCircle, ExternalLink, Clock, MessageSquare, Award, LayoutDashboard, Loader2 } from 'lucide-react'
 
 export default function InterviewComplete() {
-  const { candidate, duration, questionsAnswered, transcript, teachingConvo, setEvaluation } = useInterview()
+  const { candidate, duration, questionsAnswered, transcript, teachingConvo, evaluation, setEvaluation } = useInterview()
   const [evalStatus, setEvalStatus] = useState('loading') // loading | done | error
   const totalMin = Math.floor((duration || 600) / 60)
   const totalSec = (duration || 600) % 60
@@ -29,6 +29,7 @@ export default function InterviewComplete() {
           duration: `${totalMin}m ${totalSec}s`,
           questionsAnswered: questionsAnswered || 6,
           transcript: transcript.map(t => ({ role: t.role === 'ai' ? 'AI' : 'Candidate', text: t.text })),
+          teachingConvo: teachingConvo.map(t => ({ role: t.role, text: t.text })),
         }
         stored.unshift(entry)
         localStorage.setItem('cuemath_evaluations', JSON.stringify(stored.slice(0, 20)))
@@ -123,6 +124,43 @@ export default function InterviewComplete() {
               </div>
             ))}
           </div>
+
+          {/* Evaluation results */}
+          {evalStatus === 'done' && evaluation && (
+            <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-6 mb-8 text-left">
+              <h3 className="font-bold text-sm text-gray-400 uppercase tracking-wide mb-4">Your Evaluation</h3>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-4xl font-black text-[#1A1A1A]">{evaluation.overall?.toFixed(1) ?? '—'}<span className="text-lg text-gray-400 font-normal">/5</span></p>
+                  <p className="text-xs text-gray-500 mt-0.5">Overall Score</p>
+                </div>
+                <span className={`text-sm font-bold px-4 py-2 rounded-full ${
+                  evaluation.recommendation === 'Advance' ? 'bg-green-100 text-green-700' :
+                  evaluation.recommendation === 'Reject'  ? 'bg-red-100 text-red-600' :
+                  'bg-yellow-100 text-yellow-700'
+                }`}>{evaluation.recommendation}</span>
+              </div>
+              {evaluation.dimensions?.length > 0 && (
+                <div className="flex flex-col gap-2 mb-4">
+                  {evaluation.dimensions.map((d, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <span className="text-xs text-gray-600 w-32 shrink-0">{d.name}</span>
+                      <div className="flex-1 bg-gray-200 rounded-full h-1.5">
+                        <div className="h-full bg-[#FFD000] rounded-full" style={{ width: `${(d.score / 5) * 100}%` }} />
+                      </div>
+                      <span className="text-xs font-bold text-[#1A1A1A] w-6 text-right">{d.score?.toFixed(1)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {evaluation.strengths?.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-xs font-bold text-green-700 mb-1.5">Strengths</p>
+                  {evaluation.strengths.map((s, i) => <p key={i} className="text-xs text-gray-600 mb-1">✓ {s}</p>)}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a

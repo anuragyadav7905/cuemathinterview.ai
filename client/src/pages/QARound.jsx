@@ -25,6 +25,7 @@ export default function QARound() {
   const [status, setStatus] = useState('speaking') // speaking | listening | processing
   const [isRecording, setIsRecording] = useState(false)
   const [liveTranscript, setLiveTranscript] = useState('')
+  const [typedAnswer, setTypedAnswer] = useState('')
   const [elapsed, setElapsed] = useState(0)
   const [metrics] = useState({ confidence: 'Good', eyeContact: 'Yes', pace: 'Normal' })
 
@@ -126,6 +127,30 @@ export default function QARound() {
     else if (status === 'listening') startListening()
   }
 
+  function handleSubmitTyped() {
+    if (!typedAnswer.trim() || status === 'speaking' || status === 'processing') return
+    if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null }
+    setIsRecording(false)
+    setStatus('processing')
+    const answer = typedAnswer.trim()
+    setTypedAnswer('')
+    setLiveTranscript('')
+    addTranscript('ai', QUESTIONS[qIndex])
+    addTranscript('candidate', answer)
+    setTimeout(() => {
+      if (qIndex + 1 >= QUESTIONS.length) {
+        setQuestionsAnswered(QUESTIONS.length)
+        setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000))
+        navigate('/interview/teaching')
+      } else {
+        const next = qIndex + 1
+        setQIndex(next)
+        speakQuestion(QUESTIONS[next])
+        setQuestionsAnswered(next + 1)
+      }
+    }, 800)
+  }
+
   const progressPct = ((qIndex) / QUESTIONS.length) * 100
 
   return (
@@ -207,6 +232,31 @@ export default function QARound() {
               <p className="text-white/90 text-sm leading-relaxed min-h-[1.5rem]">
                 {liveTranscript || <span className="text-gray-500 italic">Listening...</span>}
               </p>
+            </div>
+          )}
+
+          {/* Text input fallback */}
+          {status !== 'speaking' && (
+            <div className="mt-6 max-w-xl w-full">
+              <p className="text-xs text-gray-500 mb-2 text-center">Or type your answer</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Type your answer here..."
+                  value={typedAnswer}
+                  onChange={e => setTypedAnswer(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSubmitTyped()}
+                  disabled={status === 'processing'}
+                  className="flex-1 bg-white/5 border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-[#FFD000]/50 disabled:opacity-40"
+                />
+                <button
+                  onClick={handleSubmitTyped}
+                  disabled={!typedAnswer.trim() || status === 'processing'}
+                  className="bg-[#FFD000] text-[#1A1A1A] font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-[#f0c400] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Submit
+                </button>
+              </div>
             </div>
           )}
 
