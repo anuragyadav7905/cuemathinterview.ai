@@ -1,71 +1,42 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../context/InterviewContext'
-import { Mic, MicOff, Camera, Square, Undo2, Redo2, Trash2, Type, Minus, Circle, MousePointer, Eraser, Pen } from 'lucide-react'
-import axios from 'axios'
-import toast from 'react-hot-toast'
-
-const TOPIC = 'Fractions & Division'
-const GRADE = '5'
-const COLORS = ['#1A1A1A', '#FFD000', '#EF4444', '#3B82F6', '#22C55E', '#FFFFFF']
-const TOOLS = [
-  { id: 'select', icon: <MousePointer size={16} />, label: 'Select' },
-  { id: 'pen',    icon: <Pen size={16} />,          label: 'Draw' },
-  { id: 'text',   icon: <Type size={16} />,          label: 'Text' },
-  { id: 'rect',   icon: <Square size={16} />,        label: 'Rect' },
-  { id: 'circle', icon: <Circle size={16} />,        label: 'Circle' },
-  { id: 'line',   icon: <Minus size={16} />,         label: 'Line' },
-  { id: 'eraser', icon: <Eraser size={16} />,        label: 'Erase' },
-]
+import { Logo } from '../components/Navbar'
+import CameraPiP from '../components/CameraPiP'
+import { useCamera } from '../hooks/useCamera'
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
+import { useTimer } from '../hooks/useTimer'
+import { sendChatMessage, saveTeachingTranscript } from '../services/api'
+import { TOOLS, COLORS, TOPIC, GRADE } from '../lib/constants'
+import { Mic, MicOff, Camera, Undo2, Redo2, Trash2 } from 'lucide-react'
 
 export default function TeachingDemo() {
   const navigate = useNavigate()
   const { addTeachingMessage, setDuration, interviewId, teachingConvo } = useInterview()
 
+  const videoRef = useCamera()
+  const { isRecording, liveText, start: startMic, stop: stopMicRaw } = useSpeechRecognition()
+  const { elapsed, fmt, getDuration } = useTimer()
+
   // Canvas refs
-  const canvasRef     = useRef(null)
-  const historyRef    = useRef([])
-  const redoRef       = useRef([])
-  const isDrawingRef  = useRef(false)
-  const startPosRef   = useRef({ x: 0, y: 0 })   // fixed start of current stroke/shape
-  const snapRef       = useRef(null)               // ImageData snapshot for live shape preview
+  const canvasRef    = useRef(null)
+  const historyRef   = useRef([])
+  const redoRef      = useRef([])
+  const isDrawingRef = useRef(false)
+  const startPosRef  = useRef({ x: 0, y: 0 })
+  const snapRef      = useRef(null)
 
-  // Media refs
-  const videoRef      = useRef(null)
-  const recognitionRef = useRef(null)
-  const startTimeRef  = useRef(Date.now())
-
-  // Chat ref for auto-scroll
   const chatBottomRef = useRef(null)
 
   const [tool, setTool]           = useState('pen')
   const [color, setColor]         = useState('#1A1A1A')
   const [lineWidth, setLineWidth] = useState(3)
-  const [isRecording, setIsRecording] = useState(false)
-  const [liveText, setLiveText]   = useState('')
   const [isThinking, setIsThinking] = useState(false)
   const [messages, setMessages]   = useState([
     { role: 'student', text: "Hi! I'm Arjun 👋 I'm ready to learn!", ts: new Date() }
   ])
-  const [elapsed, setElapsed]     = useState(0)
-  const [metrics]                 = useState({ confidence: 87, clarity: 76, pace: 91 })
+  const [metrics] = useState({ confidence: 87, clarity: 76, pace: 91 })
 
-  // Timer
-  useEffect(() => {
-    const iv = setInterval(() => setElapsed(e => e + 1), 1000)
-    return () => clearInterval(iv)
-  }, [])
-  const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
-
-  // Camera
-  useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => { if (videoRef.current) videoRef.current.srcObject = stream })
-      .catch(() => {})
-    return () => videoRef.current?.srcObject?.getTracks().forEach(t => t.stop())
-  }, [])
-
-  // Auto-scroll chat
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isThinking])
@@ -125,17 +96,14 @@ export default function TeachingDemo() {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     const pos = getPos(e)
-
     saveHistory()
     isDrawingRef.current = true
     startPosRef.current  = pos
-
     if (tool === 'pen' || tool === 'eraser') {
       applyStrokeStyle(ctx)
       ctx.beginPath()
       ctx.moveTo(pos.x, pos.y)
     } else {
-      // Save pixel snapshot for live preview
       snapRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height)
     }
   }
@@ -145,13 +113,11 @@ export default function TeachingDemo() {
     const canvas = canvasRef.current
     const ctx    = canvas.getContext('2d')
     const pos    = getPos(e)
-
     if (tool === 'pen' || tool === 'eraser') {
       applyStrokeStyle(ctx)
       ctx.lineTo(pos.x, pos.y)
       ctx.stroke()
     } else if (tool === 'rect' || tool === 'circle' || tool === 'line') {
-      // Restore snapshot, then draw preview
       ctx.putImageData(snapRef.current, 0, 0)
       drawShape(ctx, startPosRef.current, pos)
     }
@@ -162,9 +128,7 @@ export default function TeachingDemo() {
     isDrawingRef.current = false
     const ctx = canvasRef.current.getContext('2d')
     const pos = getPos(e)
-
     if (tool === 'rect' || tool === 'circle' || tool === 'line') {
-      // Restore snapshot and draw final shape cleanly
       ctx.putImageData(snapRef.current, 0, 0)
       drawShape(ctx, startPosRef.current, pos)
       snapRef.current = null
@@ -215,34 +179,8 @@ export default function TeachingDemo() {
 
   // ── Mic & AI chat ───────────────────────────────────────────────────────────
 
-  const liveTextRef = useRef('')
-
-  function startMic() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SR) { toast.error('Speech recognition not supported in this browser'); return }
-    const rec = new SR()
-    recognitionRef.current = rec
-    rec.continuous     = true
-    rec.interimResults = true
-    rec.lang           = 'en-IN'
-    rec.onresult = e => {
-      const text = Array.from(e.results).map(r => r[0].transcript).join(' ')
-      liveTextRef.current = text
-      setLiveText(text)
-    }
-    rec.onerror = () => setIsRecording(false)
-    rec.start()
-    setIsRecording(true)
-    liveTextRef.current = ''
-    setLiveText('')
-  }
-
   async function stopMic() {
-    recognitionRef.current?.stop()
-    setIsRecording(false)
-    const spoken = liveTextRef.current.trim()
-    liveTextRef.current = ''
-    setLiveText('')
+    const spoken = stopMicRaw()
     if (!spoken) return
 
     const teacherMsg = { role: 'teacher', text: spoken, ts: new Date() }
@@ -251,10 +189,11 @@ export default function TeachingDemo() {
     setIsThinking(true)
 
     try {
-      const { data } = await axios.post('/api/chat', { message: spoken })
+      const data = await sendChatMessage(spoken)
       setMessages(p => [...p, { role: 'student', text: data.text, ts: new Date() }])
       addTeachingMessage('student', data.text)
-    } catch {
+    } catch (err) {
+      console.error('Chat message failed:', err.message)
       const fallback = "Can you explain that again? 🤔"
       setMessages(p => [...p, { role: 'student', text: fallback, ts: new Date() }])
     } finally {
@@ -262,12 +201,15 @@ export default function TeachingDemo() {
     }
   }
 
+  function handleMicToggle() {
+    if (isRecording) stopMic()
+    else startMic()
+  }
+
   function endSession() {
-    setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000))
+    setDuration(getDuration())
     if (interviewId && !String(interviewId).startsWith('local_')) {
-      axios.post(`/api/interviews/${interviewId}/teaching-transcript`, {
-        entries: teachingConvo.map(t => ({ role: t.role, text: t.text })),
-      }).catch(() => {})
+      saveTeachingTranscript(interviewId, teachingConvo.map(t => ({ role: t.role, text: t.text }))).catch(() => {})
     }
     navigate('/complete')
   }
@@ -278,10 +220,7 @@ export default function TeachingDemo() {
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
       {/* Top bar */}
       <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img src="/cuemath-logo.png" alt="Cuemath" className="h-7" onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex' }} />
-          <div className="items-center gap-2 hidden"><div className="w-7 h-7 bg-[#FFD000] rounded-sm flex items-center justify-center"><span className="text-[#1A1A1A] font-black text-xs">C</span></div><span className="text-[#1A1A1A] font-black text-base tracking-tight">CUEMATH</span></div>
-        </div>
+        <Logo />
         <div className="text-center">
           <p className="text-sm font-bold text-[#1A1A1A]">Teaching Session — {TOPIC}</p>
           <p className="text-xs text-gray-400">Grade {GRADE} · Live Demo</p>
@@ -368,7 +307,6 @@ export default function TeachingDemo() {
               onMouseUp={onMouseUp}
               onMouseLeave={() => {
                 if (isDrawingRef.current && snapRef.current) {
-                  // cancel shape preview on leave
                   canvasRef.current.getContext('2d').putImageData(snapRef.current, 0, 0)
                 }
                 isDrawingRef.current = false
@@ -377,13 +315,11 @@ export default function TeachingDemo() {
             />
 
             {/* Camera PiP */}
-            <div className="absolute bottom-4 left-4 w-[180px] h-[135px] bg-[#1A1A1A] rounded-xl overflow-hidden border-2 border-white shadow-xl">
-              <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
-              <div className="absolute top-1.5 left-1.5 flex items-center gap-1 bg-black/70 px-1.5 py-0.5 rounded-full">
-                <div className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse"></div>
-                <span className="text-white text-[10px]">LIVE</span>
-              </div>
-            </div>
+            <CameraPiP
+              videoRef={videoRef}
+              size="sm"
+              className="absolute bottom-4 left-4"
+            />
 
             {/* Active tool hint */}
             <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-3 py-1 rounded-full">
@@ -408,7 +344,7 @@ export default function TeachingDemo() {
             ))}
             <div className="ml-auto flex items-center gap-3">
               <button
-                onClick={isRecording ? stopMic : startMic}
+                onClick={handleMicToggle}
                 title={isRecording ? 'Stop & send' : 'Start speaking'}
                 className={`p-3 rounded-full transition-all shadow ${
                   isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-[#FFD000] text-[#1A1A1A] hover:bg-[#f0c400]'
@@ -435,7 +371,6 @@ export default function TeachingDemo() {
 
         {/* Right: AI Student panel */}
         <div className="flex-[3] flex flex-col bg-white min-w-[260px] max-w-[360px]">
-          {/* Student header */}
           <div className="p-5 border-b border-gray-200 shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center text-xl shrink-0">
@@ -475,7 +410,6 @@ export default function TeachingDemo() {
               </div>
             ))}
 
-            {/* Typing indicator */}
             {isThinking && (
               <div className="flex items-start">
                 <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-tl-sm flex gap-1">

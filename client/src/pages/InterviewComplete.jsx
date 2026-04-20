@@ -1,24 +1,23 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { useInterview } from '../context/InterviewContext'
+import Navbar from '../components/Navbar'
+import { completeInterview, submitEvaluation } from '../services/api'
 import { CheckCircle, ExternalLink, Clock, MessageSquare, Award, LayoutDashboard, Loader2, AlertTriangle } from 'lucide-react'
 
 export default function InterviewComplete() {
   const { candidate, duration, questionsAnswered, transcript, teachingConvo, interviewId, evaluation, setEvaluation } = useInterview()
-  const [evalStatus, setEvalStatus] = useState('loading') // loading | done | error
+  const [evalStatus, setEvalStatus] = useState('loading')
   const totalMin = Math.floor((duration || 0) / 60)
   const totalSec = (duration || 0) % 60
 
   useEffect(() => {
     async function runEval() {
       try {
-        // 1. Persist transcripts and mark interview complete in MongoDB
         if (interviewId && !String(interviewId).startsWith('local_')) {
-          await axios.post(`/api/interviews/${interviewId}/complete`, { duration }).catch(() => {})
+          await completeInterview(interviewId, duration).catch(() => {})
         }
 
-        // 2. Run Gemini evaluation (server saves Assessment to MongoDB automatically)
-        const { data } = await axios.post('/api/evaluate', {
+        const data = await submitEvaluation({
           candidate,
           qaTranscript: transcript,
           teachingConvo,
@@ -27,7 +26,6 @@ export default function InterviewComplete() {
         })
         setEvaluation(data)
 
-        // 3. Also persist to localStorage as a fallback for admin dashboard
         const stored = JSON.parse(localStorage.getItem('cuemath_evaluations') || '[]')
         const entry = {
           id: Date.now().toString(),
@@ -42,26 +40,22 @@ export default function InterviewComplete() {
         stored.unshift(entry)
         localStorage.setItem('cuemath_evaluations', JSON.stringify(stored.slice(0, 20)))
         setEvalStatus('done')
-      } catch {
+      } catch (err) {
+        console.error('Evaluation failed:', err.message)
         setEvalStatus('error')
       }
     }
     runEval()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // intentional mount-only: transcript/candidate are stable after interview ends
 
   const scoreColor = s => s >= 4 ? 'text-green-600' : s >= 3 ? 'text-yellow-600' : 'text-red-500'
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Nav */}
-      <nav className="border-b border-gray-100 px-10 py-4 flex items-center gap-3">
-        <img src="/cuemath-logo.png" alt="Cuemath" className="h-7" onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex' }} />
-        <div className="items-center gap-2 hidden"><div className="w-7 h-7 bg-[#FFD000] rounded-sm flex items-center justify-center"><span className="text-[#1A1A1A] font-black text-xs">C</span></div><span className="text-[#1A1A1A] font-black text-lg tracking-tight">CUEMATH</span></div>
-      </nav>
+      <Navbar />
 
       <div className="flex-1 flex items-center justify-center py-16">
         <div className="max-w-lg w-full text-center px-8">
-          {/* Success icon */}
           <div className="w-24 h-24 bg-[#FFD000] rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-[#FFD000]/30">
             <CheckCircle size={44} className="text-[#1A1A1A]" strokeWidth={2.5} />
           </div>
@@ -81,9 +75,7 @@ export default function InterviewComplete() {
                   <Clock size={16} className="text-[#FFD000]" />
                   <span className="text-sm">Duration</span>
                 </div>
-                <span className="text-sm font-bold text-[#1A1A1A]">
-                  {totalMin}m {totalSec}s
-                </span>
+                <span className="text-sm font-bold text-[#1A1A1A]">{totalMin}m {totalSec}s</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 text-gray-600">
@@ -116,7 +108,6 @@ export default function InterviewComplete() {
             </div>
           </div>
 
-          {/* Loading state */}
           {evalStatus === 'loading' && (
             <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-8 mb-6 flex flex-col items-center gap-4">
               <Loader2 size={36} className="animate-spin text-[#FFD000]" />
@@ -127,7 +118,6 @@ export default function InterviewComplete() {
             </div>
           )}
 
-          {/* Error state */}
           {evalStatus === 'error' && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5 mb-6 flex items-start gap-3 text-left">
               <AlertTriangle size={18} className="text-yellow-600 shrink-0 mt-0.5" />
@@ -138,7 +128,6 @@ export default function InterviewComplete() {
             </div>
           )}
 
-          {/* Evaluation results */}
           {evalStatus === 'done' && evaluation && (
             <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl p-6 mb-6 text-left">
               <div className="flex items-center justify-between mb-5">
@@ -156,7 +145,6 @@ export default function InterviewComplete() {
                 }`}>{evaluation.recommendation}</span>
               </div>
 
-              {/* Dimension bars */}
               {evaluation.dimensions?.length > 0 && (
                 <div className="flex flex-col gap-2.5 mb-5">
                   {evaluation.dimensions.map((d, i) => (
@@ -188,7 +176,6 @@ export default function InterviewComplete() {
             </div>
           )}
 
-          {/* What happens next */}
           <div className="bg-[#1A1A1A] rounded-2xl p-6 mb-8 text-left">
             <h3 className="font-bold text-sm text-white/60 uppercase tracking-wide mb-4">What happens next?</h3>
             {[

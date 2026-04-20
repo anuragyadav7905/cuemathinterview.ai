@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../context/InterviewContext'
-import axios from 'axios'
+import { registerCandidate } from '../services/api'
 import toast from 'react-hot-toast'
 import { Clock, Mic, HelpCircle, ChevronRight, Star, Shield, Zap } from 'lucide-react'
+import { Logo } from '../components/Navbar'
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -33,12 +34,11 @@ export default function LandingPage() {
     }
 
     try {
-      const { data } = await axios.post('/api/candidates', candidateData)
+      const data = await registerCandidate(candidateData)
       setCandidate(data)
       toast.success(`Welcome, ${data.name}!`)
       navigate('/pre-interview')
     } catch {
-      // Backend unavailable — proceed with local data
       setCandidate({ ...candidateData, _id: `local_${Date.now()}` })
       toast.success(`Welcome, ${candidateData.name}!`)
       navigate('/pre-interview')
@@ -56,23 +56,7 @@ export default function LandingPage() {
 
       {/* Navbar */}
       <nav className="border-b border-gray-100 px-12 py-4 flex items-center justify-between sticky top-0 bg-white z-50">
-        <div className="flex items-center gap-2">
-          <img
-            src="/cuemath-logo.png"
-            alt="Cuemath"
-            className="h-8"
-            onError={e => {
-              e.currentTarget.style.display = 'none'
-              e.currentTarget.nextSibling.style.display = 'flex'
-            }}
-          />
-          <div className="items-center gap-2 hidden" id="logo-fallback">
-            <div className="w-8 h-8 bg-[#FFD000] rounded-sm flex items-center justify-center">
-              <span className="text-[#1A1A1A] font-black text-sm">C</span>
-            </div>
-            <span className="text-[#1A1A1A] font-black text-xl tracking-tight">CUEMATH</span>
-          </div>
-        </div>
+        <Logo />
         <div className="flex items-center gap-4">
           <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Tutor Assessment Platform</span>
         </div>
@@ -97,7 +81,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-lg text-gray-500 leading-relaxed mb-10 max-w-md">
-              Complete a 10-minute AI-powered voice interview to qualify as a Cuemath tutor. 
+              Complete a 10-minute AI-powered voice interview to qualify as a Cuemath tutor.
               Our AI evaluates your teaching ability, communication, and confidence in real time.
             </p>
 

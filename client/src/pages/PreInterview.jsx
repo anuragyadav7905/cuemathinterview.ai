@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../context/InterviewContext'
+import Navbar from '../components/Navbar'
 import { Camera, Mic, Volume2, Wifi, CheckCircle, XCircle, ChevronRight, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -13,7 +14,7 @@ export default function PreInterview() {
   const animFrameRef = useRef(null)
 
   const [checks, setChecks] = useState({
-    camera: 'pending',   // pending | pass | fail
+    camera: 'pending',
     mic: 'pending',
     speaker: 'pending',
     internet: 'pending'
@@ -22,14 +23,11 @@ export default function PreInterview() {
   const [consent, setConsent] = useState(false)
   const [speakerTested, setSpeakerTested] = useState(false)
 
-  // Camera check
   useEffect(() => {
     async function initCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-        }
+        if (videoRef.current) videoRef.current.srcObject = stream
         setChecks(p => ({ ...p, camera: 'pass', mic: 'pass' }))
         startAudioAnalysis(stream)
       } catch {
@@ -43,7 +41,6 @@ export default function PreInterview() {
     }
   }, [])
 
-  // Internet check
   useEffect(() => {
     setChecks(p => ({ ...p, internet: navigator.onLine ? 'pass' : 'fail' }))
   }, [])
@@ -104,16 +101,9 @@ export default function PreInterview() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Nav */}
-      <nav className="bg-white border-b border-gray-200 px-10 py-4 flex items-center gap-3">
-        <img src="/cuemath-logo.png" alt="Cuemath" className="h-7" onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex' }} />
-        <div className="items-center gap-2 hidden"><div className="w-7 h-7 bg-[#FFD000] rounded-sm flex items-center justify-center"><span className="text-[#1A1A1A] font-black text-xs">C</span></div><span className="text-[#1A1A1A] font-black text-lg tracking-tight">CUEMATH</span></div>
-        <span className="text-gray-300 mx-1">·</span>
-        <span className="text-sm text-gray-500">Pre-Interview Setup</span>
-      </nav>
+      <Navbar breadcrumb="Pre-Interview Setup" />
 
       <div className="max-w-5xl mx-auto px-8 py-10">
-        {/* Welcome */}
         <div className="mb-8">
           <h1 className="text-3xl font-black text-[#1A1A1A]">
             Welcome, {candidate?.name || 'Candidate'}! 👋
@@ -124,7 +114,6 @@ export default function PreInterview() {
         <div className="grid grid-cols-3 gap-6">
           {/* Left col: Timeline + Tips */}
           <div className="col-span-1 flex flex-col gap-5">
-            {/* Interview Timeline */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6">
               <h3 className="font-bold text-sm text-[#1A1A1A] mb-5 uppercase tracking-wide">Interview Flow</h3>
               <div className="flex flex-col gap-0">
@@ -152,7 +141,6 @@ export default function PreInterview() {
               </div>
             </div>
 
-            {/* Tips */}
             <div className="bg-[#FFD000]/8 border border-[#FFD000]/30 rounded-2xl p-5">
               <h3 className="font-bold text-sm text-[#1A1A1A] mb-3 flex items-center gap-2">
                 <AlertCircle size={15} /> Quick Tips
@@ -173,12 +161,10 @@ export default function PreInterview() {
 
           {/* Right col: Environment checks */}
           <div className="col-span-2 flex flex-col gap-5">
-            {/* Camera Preview */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6">
               <h3 className="font-bold text-sm text-[#1A1A1A] mb-4 uppercase tracking-wide">Environment Check</h3>
-              
+
               <div className="grid grid-cols-2 gap-5">
-                {/* Camera preview */}
                 <div>
                   <div className="bg-[#1A1A1A] rounded-xl overflow-hidden aspect-video relative">
                     <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
@@ -196,9 +182,7 @@ export default function PreInterview() {
                   </div>
                 </div>
 
-                {/* Checks list */}
                 <div className="flex flex-col gap-3">
-                  {/* Camera */}
                   <div className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl">
                     <div className="flex items-center gap-3">
                       <Camera size={16} className="text-gray-500" />
@@ -210,7 +194,6 @@ export default function PreInterview() {
                     {statusIcon(checks.camera)}
                   </div>
 
-                  {/* Mic + level */}
                   <div className="p-3.5 bg-gray-50 rounded-xl">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
@@ -230,7 +213,6 @@ export default function PreInterview() {
                     </div>
                   </div>
 
-                  {/* Speaker */}
                   <div className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl">
                     <div className="flex items-center gap-3">
                       <Volume2 size={16} className="text-gray-500" />
@@ -250,7 +232,6 @@ export default function PreInterview() {
                     </div>
                   </div>
 
-                  {/* Internet */}
                   <div className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl">
                     <div className="flex items-center gap-3">
                       <Wifi size={16} className="text-gray-500" />
@@ -265,7 +246,6 @@ export default function PreInterview() {
               </div>
             </div>
 
-            {/* Consent + CTA */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6">
               <label className="flex items-start gap-3 cursor-pointer mb-5">
                 <input
@@ -276,7 +256,7 @@ export default function PreInterview() {
                   className="mt-0.5 w-4 h-4 accent-[#FFD000] cursor-pointer"
                 />
                 <span className="text-sm text-gray-600 leading-relaxed">
-                  I consent to <strong>video and audio recording</strong> during this interview session for evaluation purposes. 
+                  I consent to <strong>video and audio recording</strong> during this interview session for evaluation purposes.
                   Recordings are processed securely and used solely for candidate assessment.
                 </span>
               </label>
