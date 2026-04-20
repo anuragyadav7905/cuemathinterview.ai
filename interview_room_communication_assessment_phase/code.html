@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cuemath AI Interview Room</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#7b5800",
+                    "on-primary-fixed": "#271900",
+                    "outline": "#837560",
+                    "on-secondary-fixed": "#1c1b1b",
+                    "surface": "#fcf9f8",
+                    "surface-container-low": "#f6f3f2",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#65d3ff",
+                    "surface-container-high": "#ebe7e7",
+                    "secondary-fixed": "#e5e2e1",
+                    "primary": "#7b5800",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#656464",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "background": "#fcf9f8",
+                    "secondary-container": "#e5e2e1",
+                    "secondary": "#5f5e5e",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#d5c4ac",
+                    "primary-fixed": "#ffdea6",
+                    "on-tertiary-container": "#005973",
+                    "error": "#ba1a1a",
+                    "on-surface-variant": "#504532",
+                    "tertiary": "#006683",
+                    "inverse-primary": "#ffbb11",
+                    "inverse-on-surface": "#313030",
+                    "surface-dim": "#dcd9d9",
+                    "surface-container": "#f0edec",
+                    "surface-variant": "#e5e2e1",
+                    "surface-bright": "#fcf9f8",
+                    "surface-container-highest": "#e5e2e1",
+                    "on-surface": "#1c1b1b",
+                    "on-background": "#1c1b1b",
+                    "primary-fixed-dim": "#ffbb11",
+                    "on-primary-container": "#6c4d00",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#001f2a",
+                    "on-tertiary-fixed-variant": "#004d64",
+                    "tertiary-fixed": "#bde9ff",
+                    "primary-container": "#ffba07",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#474646",
+                    "inverse-surface": "#313030",
+                    "on-primary-fixed-variant": "#5d4200",
+                    "tertiary-container": "#64d3ff",
+                    "secondary-fixed-dim": "#c9c6c5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            },
+            animation: {
+                'pulse-red': 'pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+                'pulse-red': {
+                    '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                    '50%': { opacity: .8, transform: 'scale(1.05)' },
+                }
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .voice-ring {
+            border: 2px solid #FFD000;
+            opacity: 0;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen flex flex-col overflow-hidden">
+<!-- Top Bar -->
+<header class="bg-inverse-surface text-on-secondary px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+<div class="text-xl font-black tracking-tighter text-white">CUEMATH</div>
+<div class="flex items-center gap-4">
+<span class="font-headline font-semibold text-sm tracking-wide text-white">Question 2 of 6</span>
+</div>
+<div class="flex items-center gap-2 bg-stone-700/50 px-4 py-1.5 rounded-full border border-white/10">
+<span class="material-symbols-outlined text-primary-container text-sm">timer</span>
+<span class="font-mono font-medium text-sm text-white">03:24</span>
+</div>
+</header>
+<div class="flex flex-grow relative">
+<!-- Main Interview Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center px-6 max-w-4xl mx-auto w-full text-center py-12">
+<!-- Voice Visualization Area -->
+<div class="relative flex items-center justify-center mb-16">
+<div class="absolute w-64 h-64 rounded-full border-2 border-primary-container/20 scale-150"></div>
+<div class="absolute w-48 h-48 rounded-full border-2 border-primary-container/40 scale-125"></div>
+<div class="absolute w-32 h-32 rounded-full border-2 border-primary-container/60 scale-110"></div>
+<div class="w-24 h-24 bg-primary-container rounded-full flex items-center justify-center shadow-lg relative z-10">
+<span class="material-symbols-outlined text-on-primary-container text-4xl" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
+</div>
+</div>
+<!-- Content Area -->
+<div class="space-y-6 mb-20 max-w-2xl">
+<h1 class="font-headline text-3xl md:text-4xl font-bold text-on-background leading-tight tracking-tight">
+                How would you explain fractions to a 9-year-old who is confused?
+            </h1>
+<div class="flex items-center justify-center gap-2">
+<span class="w-2 h-2 bg-primary rounded-full"></span>
+<p class="text-secondary font-medium uppercase tracking-[0.1em] text-xs">AI is speaking...</p>
+</div>
+</div>
+<!-- Interaction Zone -->
+<div class="flex flex-col items-center gap-4">
+<!-- Mic button toggled to Recording state -->
+<button class="w-20 h-20 rounded-full bg-red-500 flex items-center justify-center shadow-xl animate-pulse-red transition-transform group relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>
+<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+<p class="font-headline font-bold text-sm tracking-tight text-red-600">Recording...</p>
+</div>
+</main>
+<!-- Sidebar: Session Progress -->
+<aside class="w-[250px] border-l border-outline-variant/30 bg-surface-container-lowest p-6 flex flex-col shrink-0">
+<h3 class="font-headline font-bold text-sm text-on-surface-variant uppercase tracking-wider mb-8">Session Progress</h3>
+<div class="flex-grow space-y-8 relative">
+<!-- Vertical Line for Stepper -->
+<div class="absolute left-[11px] top-2 bottom-2 w-0.5 bg-outline-variant/20"></div>
+<!-- Step 1 -->
+<div class="flex items-start gap-4 relative z-10">
+<div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-sm">check</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-semibold text-green-600">Introduction</p>
+<p class="text-[10px] text-secondary">Completed</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex items-start gap-4 relative z-10">
+<div class="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center shrink-0 ring-4 ring-primary-container/20">
+<div class="w-2 h-2 rounded-full bg-on-primary-container"></div>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-bold text-on-surface">Communication Assessment</p>
+<p class="text-[10px] text-primary font-medium uppercase tracking-tight">Current Step</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="flex items-start gap-4 relative z-10">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest border-2 border-outline-variant/30 flex items-center justify-center shrink-0"></div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-secondary">Teaching Demo</p>
+<p class="text-[10px] text-secondary opacity-60">Upcoming</p>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="flex items-start gap-4 relative z-10">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest border-2 border-outline-variant/30 flex items-center justify-center shrink-0"></div>
+<div class="space-y-1">
+<p class="text-sm font-medium text-secondary">Scenario Handling</p>
+<p class="text-[10px] text-secondary opacity-60">Upcoming</p>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-outline-variant/20 space-y-4">
+<div>
+<p class="text-[10px] uppercase font-bold text-secondary tracking-widest">Phase</p>
+<p class="text-sm font-semibold text-on-surface">Q&amp;A Round</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-secondary tracking-widest">Next</p>
+<p class="text-sm font-semibold text-on-surface">Teaching Round</p>
+</div>
+</div>
+</aside>
+<!-- Candidate Camera Feed Overlay (Bottom-Left) -->
+<div class="fixed bottom-32 left-8 z-40">
+<div class="w-[280px] h-[200px] rounded-xl overflow-hidden border-2 border-green-500/50 shadow-2xl bg-black relative group">
+<!-- Simulated Video Content -->
+<div class="absolute inset-0 bg-stone-900 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/10 text-6xl">person</span>
+</div>
+<!-- LIVE Badge -->
+<div class="absolute top-3 left-3 flex items-center gap-1.5 bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-bold tracking-widest animate-pulse">
+<span class="w-1.5 h-1.5 bg-white rounded-full"></span>
+                LIVE
+            </div>
+<!-- Control Overlay (Subtle) -->
+<div class="absolute bottom-3 right-3 flex gap-2">
+<button class="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors">
+<span class="material-symbols-outlined text-sm">videocam</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors">
+<span class="material-symbols-outlined text-sm">mic</span>
+</button>
+</div>
+</div>
+<!-- AI Metrics Strip -->
+<div class="mt-3 w-[280px] bg-white/80 backdrop-blur-md rounded-lg border border-outline-variant/20 p-3 shadow-lg flex flex-wrap gap-x-4 gap-y-2">
+<div class="flex items-center gap-1.5">
+<span class="text-[10px] font-bold text-secondary uppercase tracking-tight">Confidence:</span>
+<span class="text-[11px] font-medium text-on-surface">Good</span>
+<span class="text-[8px] text-green-500">●</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-[10px] font-bold text-secondary uppercase tracking-tight">Eye Contact:</span>
+<span class="text-[11px] font-medium text-on-surface">Yes</span>
+<span class="text-[8px] text-green-500">●</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-[10px] font-bold text-secondary uppercase tracking-tight">Expression:</span>
+<span class="text-[11px] font-semibold text-blue-600">Relaxed</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Area: Live Transcript -->
+<footer class="w-full p-8 max-w-screen-xl mx-auto mt-auto">
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/15 text-center">
+<p class="text-on-secondary-container italic text-sm font-medium opacity-60">
+            "Your answer will appear here as you speak..."
+        </p>
+</div>
+</footer>
+<!-- Decorative Subtle Background Element -->
+<div class="fixed bottom-0 left-0 -z-10 opacity-20 pointer-events-none">
+<img alt="abstract geometric pattern" class="w-96 h-96 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbg3AxLDCVlUXV5ANGxZt43EIQQtehE9esa7zCdYH5rw99zj3amClxGMbLhE31_j1SAEkHV8793wlWVMGU14KUQ5uJWCrZZfiY8WgekrTTRQz26QyDQrkpxsn4MRUtxmXMxAfgLjUN3qsc8DazANL05jKK5T0gP1mjI5x0yXa4QJUH7okVhV-l1IGVz0OP1I7pcXpwi0EWWbAR-S68gCkjxCDfS1OwqgiYmIluLD9rQOi--IBvi1a4S8NPMnfMIhfWKTZM5cdHKvQ"/>
+</div>
+</body></html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#1c1b1b",
+                    "inverse-primary": "#ffbb11",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#f0edec",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#ffbb11",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#5f5e5e",
+                    "surface": "#fcf9f8",
+                    "on-secondary-container": "#656464",
+                    "surface-container-low": "#f6f3f2",
+                    "on-primary-container": "#6c4d00",
+                    "on-background": "#1c1b1b",
+                    "tertiary": "#006683",
+                    "on-surface-variant": "#504532",
+                    "primary": "#7b5800",
+                    "outline": "#837560",
+                    "outline-variant": "#d5c4ac",
+                    "tertiary-fixed": "#bde9ff",
+                    "primary-container": "#ffba07",
+                    "secondary-fixed": "#e5e2e1",
+                    "on-secondary-fixed-variant": "#474646",
+                    "inverse-on-surface": "#f3f0ef",
+                    "primary-fixed": "#ffdea6",
+                    "surface-container-highest": "#e5e2e1",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#fcf9f8",
+                    "on-surface": "#1c1b1b",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#5d4200",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#e5e2e1",
+                    "surface-container-high": "#ebe7e7",
+                    "tertiary-fixed-dim": "#65d3ff",
+                    "surface-variant": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#004d64",
+                    "secondary-fixed-dim": "#c9c6c5",
+                    "surface-dim": "#dcd9d9",
+                    "tertiary-container": "#64d3ff",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#7b5800",
+                    "on-primary-fixed": "#271900",
+                    "inverse-surface": "#313030",
+                    "on-tertiary-fixed": "#001f2a",
+                    "on-tertiary-container": "#005973",
+                    "background": "#fcf9f8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf9f8;
+        }
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+<!-- Navigation Shell Suppressed as per "Semantic Shell Mandate" (Transactional/Success Screen) -->
+<main class="flex-grow flex items-center justify-center p-6 sm:p-12 relative overflow-hidden">
+<!-- Subtle background texture/blob for "The Illuminator" aesthetic -->
+<div class="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-primary-container opacity-10 rounded-full blur-[100px]"></div>
+<div class="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-tertiary-container opacity-10 rounded-full blur-[80px]"></div>
+<div class="max-w-2xl w-full text-center z-10">
+<!-- Icon Section -->
+<div class="mb-10 inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary-container text-on-primary-container relative">
+<div class="absolute inset-0 rounded-full animate-ping bg-primary-container opacity-20"></div>
+<span class="material-symbols-outlined text-5xl font-bold" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Content Section -->
+<h1 class="text-5xl md:text-6xl font-bold tracking-tight text-on-background mb-6">
+                Interview Complete!
+            </h1>
+<p class="text-body-lg text-secondary max-w-lg mx-auto mb-12 leading-relaxed">
+                Thank you for your time. Our team will review your conversation and reach out within 48 hours.
+            </p>
+<!-- Summary Card: Level 2 (Interaction) surface-container-lowest sitting on Level 0 surface -->
+<div class="bg-surface-container-lowest rounded-xl p-8 mb-12 shadow-[0_12px_40px_rgba(28,27,27,0.06)] max-w-md mx-auto">
+<div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-4 text-sm font-medium text-secondary">
+<div class="flex flex-col items-center sm:items-start">
+<span class="text-[10px] uppercase tracking-wider text-outline mb-1">Duration</span>
+<span class="text-on-background">8 min 32 sec</span>
+</div>
+<div class="hidden sm:block h-8 w-px bg-outline-variant opacity-20"></div>
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase tracking-wider text-outline mb-1">Questions</span>
+<span class="text-on-background">6</span>
+</div>
+<div class="hidden sm:block h-8 w-px bg-outline-variant opacity-20"></div>
+<div class="flex flex-col items-center sm:items-end">
+<span class="text-[10px] uppercase tracking-wider text-outline mb-1">Status</span>
+<div class="flex items-center gap-1.5 text-primary">
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+<span>Under Review</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Button -->
+<div class="flex flex-col items-center gap-4">
+<button class="px-10 py-4 rounded-xl border-2 border-primary-container text-primary font-bold tracking-tight transition-all hover:bg-primary-container hover:text-on-primary-container active:scale-[0.98]">
+                    Back to Cuemath
+                </button>
+</div>
+</div>
+</main>
+<!-- Illustrative Footer Logo for Branding Anchor -->
+<footer class="py-8 text-center">
+<div class="inline-flex items-center gap-2 grayscale opacity-30">
+<span class="text-lg font-bold tracking-tighter text-on-background">Cuemath</span>
+<span class="h-4 w-px bg-outline-variant"></span>
+<span class="text-xs font-medium tracking-widest uppercase">Admin Portal</span>
+</div>
+</footer>
+<!-- Decorative Image Layering (Ghosting) -->
+<div class="fixed bottom-0 right-0 w-1/4 h-1/4 pointer-events-none opacity-[0.03] select-none">
+<img class="w-full h-full object-contain object-bottom right" data-alt="subtle abstract geometric pattern with mathematical symbols and grids in light grey on a transparent background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAppmjmmfDrT50NDUJN5fLUMJNgj4ep9dd_XLNi-whUXYZt8s5KW3_PrGn3aj-moC-EfanC4JXHP_PhtkH7CATE-ZJ_WyNoOfbZVec-lYmYkCFfV5a1LLpHEdTRkLjNRosR5jwlsflI6Lpjc7AL8YzVwcb-JdH9wMXm2w1onXAEnS4Tou_wyEFGFQNJkca_SDg9EQw3hPH-chnTN6OLD3E8Lpcktvdmb3VaSZObK6YI8eIo-rBWxUu2KMd7lBSRwFMg-jeI-S42rfY"/>
+</div>
+</body></html>

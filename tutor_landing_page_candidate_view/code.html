@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#1c1b1b",
+                    "inverse-primary": "#ffbb11",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#f0edec",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#ffbb11",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#5f5e5e",
+                    "surface": "#fcf9f8",
+                    "on-secondary-container": "#656464",
+                    "surface-container-low": "#f6f3f2",
+                    "on-primary-container": "#6c4d00",
+                    "on-background": "#1c1b1b",
+                    "tertiary": "#006683",
+                    "on-surface-variant": "#504532",
+                    "primary": "#7b5800",
+                    "outline": "#837560",
+                    "outline-variant": "#d5c4ac",
+                    "tertiary-fixed": "#bde9ff",
+                    "primary-container": "#ffba07",
+                    "secondary-fixed": "#e5e2e1",
+                    "on-secondary-fixed-variant": "#474646",
+                    "inverse-on-surface": "#f3f0ef",
+                    "primary-fixed": "#ffdea6",
+                    "surface-container-highest": "#e5e2e1",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#fcf9f8",
+                    "on-surface": "#1c1b1b",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#5d4200",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#e5e2e1",
+                    "surface-container-high": "#ebe7e7",
+                    "tertiary-fixed-dim": "#65d3ff",
+                    "surface-variant": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#004d64",
+                    "secondary-fixed-dim": "#c9c6c5",
+                    "surface-dim": "#dcd9d9",
+                    "tertiary-container": "#64d3ff",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#7b5800",
+                    "on-primary-fixed": "#271900",
+                    "inverse-surface": "#313030",
+                    "on-tertiary-fixed": "#001f2a",
+                    "on-tertiary-container": "#005973",
+                    "background": "#fcf9f8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .btn-inner-glow {
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+        }
+        .glass-effect {
+            background: rgba(252, 249, 248, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-[#FCF9F8] dark:bg-zinc-950 flex justify-between items-center px-8 h-16 w-full docked full-width top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold text-zinc-900 dark:text-zinc-50 font-['Plus_Jakarta_Sans'] tracking-tight">CUEMATH</span>
+</div>
+</header>
+<main class="relative">
+<!-- Hero Section -->
+<section class="bg-primary-container relative pt-20 pb-32 overflow-hidden">
+<!-- Decorative Element -->
+<div class="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
+<svg viewbox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<path d="M45.7,-77.2C58.3,-69.1,67,-55.8,74.1,-41.8C81.2,-27.7,86.7,-12.9,86.5,1.9C86.3,16.7,80.4,31.4,71.7,44.1C63,56.8,51.6,67.5,38.3,74.5C25,81.5,9.8,84.9,-5.3,83.9C-20.4,82.9,-35.4,77.5,-48.5,69C-61.6,60.5,-72.8,48.9,-79.8,35.4C-86.8,21.9,-89.6,6.5,-87.3,-8.4C-85,-23.3,-77.6,-37.6,-67.2,-49C-56.8,-60.4,-43.4,-68.9,-29.8,-76.3C-16.2,-83.7,-2.4,-90.1,11.8,-88.9C26.1,-87.7,33.1,-85.3,45.7,-77.2Z" fill="#000" transform="translate(100 100)"></path>
+</svg>
+</div>
+<div class="max-w-6xl mx-auto px-8 relative z-10 flex flex-col md:flex-row items-center gap-16">
+<!-- Text Content -->
+<div class="flex-1 text-center md:text-left">
+<h1 class="text-on-background font-headline text-[3.5rem] leading-[1.1] font-bold tracking-[-0.04em] mb-6">
+                        Your AI Teaching Interview
+                    </h1>
+<p class="text-on-primary-container/80 text-lg leading-[1.6] max-w-xl mb-8">
+                        A quick 10-minute voice conversation to assess your communication, patience, and ability to explain concepts simply. No preparation needed — just be yourself and show us your passion for teaching.
+                    </p>
+<div class="flex items-center gap-4 justify-center md:justify-start">
+<div class="flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="portrait of a cheerful woman wearing glasses in a professional bright classroom environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBud7x6luVdQgpDqvT7cPU0YHbzZDEQb535u-ciBJkIThyHWhJmuz7nEkGS7J5nKLEJnBZHrEWK6W3UI9sWuWZkeKGAW_VD-ar7ZwDMAh-ABhzv3UikKK_sOztXG51GD1KNdaNzN7JtIGoAH3FcjJe2Sx6OU1Hk96QjUl8l-s1W8z-MY2iEA63gdkHGxBs5mFSsLIPanTx_oBhP--R60ND4NOOBZ7hdyZmFuf3vujxAocb6TRIG3w8PP-1V1-iEOyGPzieJBdKVHU4"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="portrait of a friendly smiling man in a business casual shirt with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApuQxHkzkloXsRruboW3jDYKAeBdxTKbv8Siwr7JfD3vEb5uT-uf1yAlc6Zy9sXnBoT9mjIVW1kg2iMAqWj49ZKkaxFIryhiXBFaWkp9GFjKBDXFCZ9ysX-5FV-8YKaGUH51n8lha9PlTXRbeA17hJ2NrldhA4J-WyfildA3JKzYFGPxJQ6uoySrYtx42Lof918kP5VReDY8xrphA6s9nOg92vgjeUhuG3i2UPFXhIlEhVga07zCL1kpkMd3c8tIGIwHjGRLAJNIU"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="smiling confident woman sitting in a modern workspace with soft blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqfnAQ4UiCNW8zaUHh_WbcFq0NHzOIZDoQXQHglxxFYS6hv2mlCdAK4Pz4_MosIWcQY_WO4v-yOvRl10tJUt73p_ZAvqXdpnC5cSIsh4_fI3jmQe6BQQERlZgs5eJo0zAW7Mms-EjkvUWv_XSCRXgkZKajdVa40us-TNyHx5l1Eo0poGxkfE1HiEMDdch5GKhii_HEqdB4ZjLS75PWj9SoZsHZO-CGhu5nvpcLNDqjPvidMNmP95NKq6WCvHsvkhlueM8DOL9tD38"/>
+</div>
+<span class="text-sm font-medium text-on-primary-container">Joined by 10,000+ top educators</span>
+</div>
+</div>
+<!-- Form Card -->
+<div class="w-full max-w-md">
+<p class="text-on-primary-container text-sm font-bold mb-4 ml-2 opacity-90">This interview is for the Cuemath tutor position</p>
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_12px_40px_rgba(28,27,27,0.06)] transform md:translate-y-4">
+<form class="space-y-6">
+<div>
+<label class="block text-[0.75rem] font-bold uppercase tracking-[0.05em] text-on-surface-variant mb-2">Full Name</label>
+<div class="bg-surface-container px-4 py-3 rounded-t-lg border-b-2 border-primary-container/30 focus-within:border-primary transition-all">
+<input class="bg-transparent border-none focus:ring-0 w-full p-0 text-on-surface placeholder:text-outline-variant" placeholder="John Doe" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-[0.75rem] font-bold uppercase tracking-[0.05em] text-on-surface-variant mb-2">Email Address</label>
+<div class="bg-surface-container px-4 py-3 rounded-t-lg border-b-2 border-primary-container/30 focus-within:border-primary transition-all">
+<input class="bg-transparent border-none focus:ring-0 w-full p-0 text-on-surface placeholder:text-outline-variant" placeholder="john@example.com" type="email"/>
+</div>
+</div>
+<div>
+<label class="block text-[0.75rem] font-bold uppercase tracking-[0.05em] text-on-surface-variant mb-2">Phone Number</label>
+<div class="bg-surface-container px-4 py-3 rounded-t-lg border-b-2 border-primary-container/30 focus-within:border-primary transition-all">
+<input class="bg-transparent border-none focus:ring-0 w-full p-0 text-on-surface placeholder:text-outline-variant" placeholder="+1 234 567 890" type="tel"/>
+</div>
+</div>
+<button class="w-full bg-primary-container hover:brightness-95 active:scale-[0.98] transition-all text-on-primary-container font-bold py-4 px-6 rounded-xl btn-inner-glow flex justify-center items-center gap-2 group" type="button">
+                                Start Interview
+                                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<p class="text-[0.75rem] text-center text-secondary text-balance">
+                                By clicking Start Interview, you agree to our Terms of Service and Privacy Policy.
+                            </p>
+</form>
+</div>
+</div>
+</div>
+</section>
+<!-- Info Cards -->
+<section class="max-w-6xl mx-auto px-8 pt-24 pb-32">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="bg-surface-container-low p-8 rounded-xl hover:bg-surface-container-high transition-colors group">
+<div class="w-12 h-12 bg-surface-container-lowest rounded-lg flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">timer</span>
+</div>
+<h3 class="font-headline text-xl font-semibold mb-2">~10 Minutes</h3>
+<p class="text-secondary text-sm leading-relaxed">Designed to respect your schedule. A concise session to evaluate core teaching competencies.</p>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-low p-8 rounded-xl hover:bg-surface-container-high transition-colors group">
+<div class="w-12 h-12 bg-surface-container-lowest rounded-lg flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">mic</span>
+</div>
+<h3 class="font-headline text-xl font-semibold mb-2">Voice Based</h3>
+<p class="text-secondary text-sm leading-relaxed">No camera required. Speak naturally with our AI to showcase your communication and explanation skills.</p>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-low p-8 rounded-xl hover:bg-surface-container-high transition-colors group">
+<div class="w-12 h-12 bg-surface-container-lowest rounded-lg flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">list</span>
+</div>
+<h3 class="font-headline text-xl font-semibold mb-2">5-7 Questions</h3>
+<p class="text-secondary text-sm leading-relaxed">Focuses on real-world classroom scenarios and problem-solving to see how you engage with students.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Decoration -->
+<footer class="bg-inverse-surface py-12 px-8">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex flex-col items-center md:items-start">
+<span class="text-xl font-bold text-white font-headline tracking-tight mb-2">CUEMATH</span>
+<p class="text-zinc-400 text-sm">Empowering educators through AI-driven assessment technology.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-zinc-400 hover:text-primary-container transition-colors text-sm" href="#">Help Center</a>
+<a class="text-zinc-400 hover:text-primary-container transition-colors text-sm" href="#">Privacy Policy</a>
+<a class="text-zinc-400 hover:text-primary-container transition-colors text-sm" href="#">Contact Support</a>
+</div>
+</div>
+<div class="max-w-6xl mx-auto mt-12 pt-8 border-t border-zinc-700/30 flex justify-between items-center text-[0.75rem] text-zinc-500">
+<span>© 2026 Cuemath. All rights reserved.</span>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-sm">language</span>
+<span>English (US)</span>
+</div>
+</div>
+</footer>
+</body></html>
