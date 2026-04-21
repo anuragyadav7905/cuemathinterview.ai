@@ -1,7 +1,6 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
-const path = require('path')
 const connectDB = require('./config/db')
 const { port } = require('./config')
 const errorHandler = require('./middleware/errorHandler')
@@ -39,12 +38,6 @@ app.get('/api/health', (req, res) => {
     service: 'CueMath AI Interview API',
     db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
   })
-})
-
-app.use(express.static(path.join(__dirname, '../client/dist')))
-app.get('*', (req, res) => {
-  if (req.path.startsWith('/api/')) return res.status(404).json({ message: 'Route not found' })
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'))
 })
 
 app.use(errorHandler)
