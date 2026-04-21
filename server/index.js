@@ -6,6 +6,8 @@ const connectDB = require('./config/db')
 const { port } = require('./config')
 const errorHandler = require('./middleware/errorHandler')
 
+const requireAuth = require('./middleware/auth')
+const authRoutes = require('./routes/auth')
 const candidateRoutes = require('./routes/candidates')
 const interviewRoutes = require('./routes/interviews')
 const chatRoutes = require('./routes/chat')
@@ -20,10 +22,11 @@ app.use(cors({
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.use('/api/auth', authRoutes)
 app.use('/api/candidates', candidateRoutes)
-app.use('/api/interviews', interviewRoutes)
-app.use('/api/chat', chatRoutes)
-app.use('/api/evaluate', evaluateRoutes)
+app.use('/api/interviews', requireAuth, interviewRoutes)
+app.use('/api/chat', requireAuth, chatRoutes)
+app.use('/api/evaluate', requireAuth, evaluateRoutes)
 
 app.get('/api/health', (req, res) => {
   const mongoose = require('mongoose')

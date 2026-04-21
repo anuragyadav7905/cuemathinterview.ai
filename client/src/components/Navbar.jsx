@@ -1,6 +1,8 @@
-/**
- * @param {{ darkMode?: boolean, breadcrumb?: string, rightContent?: import('react').ReactNode, centerContent?: import('react').ReactNode, className?: string }} props
- */
+import { useNavigate } from 'react-router-dom'
+import { LogOut } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { useInterview } from '../context/InterviewContext'
+
 export function Logo({ darkMode = false }) {
   return (
     <div className="flex items-center gap-2">
@@ -26,12 +28,22 @@ export function Logo({ darkMode = false }) {
 }
 
 export default function Navbar({ darkMode = false, breadcrumb, rightContent, centerContent, className = '' }) {
+  const { isAuthenticated, authLogout, user } = useAuth()
+  const { resetInterview } = useInterview()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    authLogout()
+    resetInterview()
+    navigate('/', { replace: true })
+  }
+
   const base = darkMode
     ? 'border-b border-white/10 px-8 py-4'
     : 'bg-white border-b border-gray-200 px-10 py-4'
-  const layout = (rightContent || centerContent)
-    ? 'flex items-center justify-between'
-    : 'flex items-center gap-3'
+
+  const hasRight = rightContent || centerContent || isAuthenticated
+  const layout = hasRight ? 'flex items-center justify-between' : 'flex items-center gap-3'
 
   return (
     <nav className={`${base} ${layout} ${className}`}>
@@ -45,7 +57,29 @@ export default function Navbar({ darkMode = false, breadcrumb, rightContent, cen
         )}
       </div>
       {centerContent && <div className="text-center">{centerContent}</div>}
-      {rightContent && <div className="flex items-center gap-3">{rightContent}</div>}
+      <div className="flex items-center gap-3">
+        {rightContent}
+        {isAuthenticated && (
+          <div className="flex items-center gap-3">
+            {user?.name && (
+              <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                {user.name}
+              </span>
+            )}
+            <button
+              onClick={handleLogout}
+              className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                darkMode
+                  ? 'text-gray-400 hover:text-white hover:bg-white/10'
+                  : 'text-gray-500 hover:text-[#1A1A1A] hover:bg-gray-100'
+              }`}
+            >
+              <LogOut size={13} />
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   )
 }

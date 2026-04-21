@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Search, Download, ChevronRight, Star, TrendingUp, MessageSquare,
   User, BadgeCheck, Users, BarChart2, ClipboardList, ArrowUpRight,
-  Filter, Eye
+  Filter, Eye, LogOut, Info
 } from 'lucide-react'
 import { Logo } from '../components/Navbar'
 import ScoreBar from '../components/ui/ScoreBar'
 import { fetchInterviews } from '../services/api'
 import { MOCK_CANDIDATES, BADGE_STYLES, BADGE_ICON } from '../lib/constants'
+import { useAuth } from '../context/AuthContext'
+import { useInterview } from '../context/InterviewContext'
 
 // ── Dashboard tab ────────────────────────────────────────────────────────────
 function DashboardTab({ candidates, onViewCandidate }) {
@@ -558,6 +561,9 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab]           = useState('Dashboard')
   const [jumpCandidate, setJumpCandidate]   = useState(null)
   const [realCandidates, setRealCandidates] = useState([])
+  const { authLogout, user } = useAuth()
+  const { resetInterview } = useInterview()
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchInterviews()
@@ -579,6 +585,12 @@ export default function AdminDashboard() {
   function handleViewCandidate(c) {
     setJumpCandidate(c)
     setActiveTab('Candidates')
+  }
+
+  function handleLogout() {
+    authLogout()
+    resetInterview()
+    navigate('/', { replace: true })
   }
 
   const allCandidates = [...realCandidates, ...MOCK_CANDIDATES]
@@ -605,12 +617,25 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {user?.name && <span className="text-xs text-gray-500">{user.name}</span>}
           <div className="bg-[#1A1A1A] text-white text-xs font-bold px-3 py-1.5 rounded-lg">Admin</div>
           <div className="w-8 h-8 bg-gradient-to-br from-[#FFD000] to-orange-400 rounded-full flex items-center justify-center">
             <User size={14} className="text-[#1A1A1A]" />
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-[#1A1A1A] px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <LogOut size={13} /> Logout
+          </button>
         </div>
       </nav>
+
+      {/* Admin auth banner */}
+      <div className="bg-blue-50 border-b border-blue-100 px-8 py-2 flex items-center gap-2">
+        <Info size={13} className="text-blue-500 shrink-0" />
+        <p className="text-xs text-blue-600">Admin authentication coming soon — role-based access control will be added in a future release.</p>
+      </div>
 
       <div className="flex flex-1 overflow-hidden">
         {activeTab === 'Dashboard'   && <DashboardTab   candidates={allCandidates} onViewCandidate={handleViewCandidate} />}

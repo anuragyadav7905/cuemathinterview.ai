@@ -1,5 +1,11 @@
 import axios from 'axios'
 
+export const signupCandidate = (data) =>
+  axios.post('/api/auth/signup', data).then(r => r.data)
+
+export const loginCandidate = (data) =>
+  axios.post('/api/auth/login', data).then(r => r.data)
+
 export const registerCandidate = (data) =>
   axios.post('/api/candidates', data).then(r => r.data)
 

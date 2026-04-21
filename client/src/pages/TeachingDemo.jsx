@@ -14,7 +14,7 @@ export default function TeachingDemo() {
   const navigate = useNavigate()
   const { addTeachingMessage, setDuration, interviewId, teachingConvo } = useInterview()
 
-  const videoRef = useCamera()
+  const { videoRef, stopCamera } = useCamera()
   const { isRecording, liveText, start: startMic, stop: stopMicRaw } = useSpeechRecognition()
   const { elapsed, fmt, getDuration } = useTimer()
 
@@ -207,6 +207,8 @@ export default function TeachingDemo() {
   }
 
   function endSession() {
+    if (isRecording) stopMicRaw()
+    stopCamera()
     setDuration(getDuration())
     if (interviewId && !String(interviewId).startsWith('local_')) {
       saveTeachingTranscript(interviewId, teachingConvo.map(t => ({ role: t.role, text: t.text }))).catch(() => {})
