@@ -39,7 +39,7 @@ export default function TeachingDemo() {
 
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, isThinking])
+  }, [messages, isThinking, liveText])
 
   // ── Whiteboard helpers ──────────────────────────────────────────────────────
 
@@ -360,15 +360,6 @@ export default function TeachingDemo() {
             </div>
           </div>
 
-          {/* Live transcript strip */}
-          {(isRecording || liveText) && (
-            <div className="px-4 py-2 bg-[#FFD000]/10 border-t border-[#FFD000]/30 flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse shrink-0"></div>
-              <p className="text-sm text-[#1A1A1A] truncate">
-                {liveText || <span className="text-gray-400 italic">Listening…</span>}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Right: AI Student panel */}
@@ -422,6 +413,16 @@ export default function TeachingDemo() {
                       style={{ animationDelay: `${d}ms` }}
                     />
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Live transcript bubble — shows while teacher is speaking */}
+            {isRecording && (
+              <div className="flex flex-col items-end">
+                <div className="max-w-[88%] px-4 py-2.5 rounded-2xl rounded-tr-sm text-sm leading-relaxed bg-[#FFD000] text-[#1A1A1A] opacity-80">
+                  {liveText || <span className="italic text-[#1A1A1A]/50">Listening…</span>}
+                  <span className="ml-1 inline-block w-1.5 h-3.5 bg-[#1A1A1A]/40 rounded-sm animate-pulse align-middle" />
                 </div>
               </div>
             )}

@@ -9,6 +9,7 @@ export default function PreInterview() {
   const navigate = useNavigate()
   const { candidate } = useInterview()
   const videoRef = useRef(null)
+  const streamRef = useRef(null)
   const audioCtxRef = useRef(null)
   const analyserRef = useRef(null)
   const animFrameRef = useRef(null)
@@ -27,6 +28,7 @@ export default function PreInterview() {
     async function initCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        streamRef.current = stream
         if (videoRef.current) videoRef.current.srcObject = stream
         setChecks(p => ({ ...p, camera: 'pass', mic: 'pass' }))
         startAudioAnalysis(stream)
@@ -38,6 +40,8 @@ export default function PreInterview() {
     return () => {
       cancelAnimationFrame(animFrameRef.current)
       if (audioCtxRef.current) audioCtxRef.current.close()
+      streamRef.current?.getTracks().forEach(t => t.stop())
+      streamRef.current = null
     }
   }, [])
 
