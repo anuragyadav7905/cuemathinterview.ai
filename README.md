@@ -139,3 +139,12 @@ cd server && npm start
 ## Architecture
 
 The app follows a linear interview flow: **Registration → Pre-Interview checks → Q&A Round → Teaching Demo → AI Evaluation → Results**. The backend persists each step to MongoDB Atlas in real time, with graceful local fallbacks if the DB or Gemini API is unavailable. The admin dashboard fetches from the API first, falling back to `localStorage` for offline demo use.
+
+## 🔮 Future Scope
+
+- 🔐 Google Authentication (already implemented in other projects AInterview  https://ainterview-iota.vercel.app  )  
+- 😊 Face Detection for confidence & eye contact tracking  
+- 🎙️ Human-like conversational voice AI  
+- 🤖 Smart AI student (age-adaptive behavior)/to have better evaluation  
+- 📊 ML-based matching system in dashboard to find best teacher
+- 📅 Automated (reduce human ops cost)  
